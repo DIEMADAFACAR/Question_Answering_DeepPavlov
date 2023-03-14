@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ответ на вопрос по тексту</title>
+    <style>
+        body {
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
+        }
+        input[type=text], textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            margin-top: 6px;
+            margin-bottom: 16px;
+            resize: vertical;
+            font-family: Arial, sans-serif;
+        }
+        input[type=submit] {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: Arial, sans-serif;
+        }
+        input[type=submit]:hover {
+            background-color: #45a049;
+            font-family: Arial, sans-serif;
+        }
+        #answer-section {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            font-family: Arial, sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <h1>Ответ на вопрос по тексту</h1>
+    <form method="POST" action="/answer">
+        <label for="context">Текст:</label><br>
+        <textarea id="context" name="context" rows="5" cols="50"></textarea><br>
+        <label for="question">Вопрос:</label><br>
+        <input type="text" id="question" name="question"><br><br>
+        <input type="submit" value="Ответ">
+    </form>
+    <div id="answer-section">
+        {% if answer %}
+            <div>
+                <h6>Ответ:</h6>
+                <p>{{ answer }}</p>
+            </div>
+        {% endif %}
+    </div>
+    <script>
+        var answerSection = document.getElementById("answer-section");
+        var form = document.querySelector("form");
+        form.addEventListener("submit", function(e) {
+            e.preventDefault();
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function() {
+                if (this.readyState === 4 && this.status === 200) {
+                    var answer = JSON.parse(this.responseText);
+                    answerSection.innerHTML = `<div>Ответ:<p>${answer}</p></div>`;
+                }
+            }
+            xhr.open("POST", "/answer", true);
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            var formData = new FormData(form);
+            var encodedData = new URLSearchParams(formData).toString();
+            xhr.send(encodedData);
+        });
+    </script>
+</body>
+</html>
+
